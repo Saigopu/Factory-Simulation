@@ -1,0 +1,107 @@
+checkbox in html ---> https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox
+
+how to get the values of the checked boxes into an array in react --> https://medium.com/codex/handling-checkboxes-in-react-3a2514b140d2
+
+what is htmlfor in react
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+
+multiple option select dropdown --> https://www.geeksforgeeks.org/how-to-select-multiple-options-at-once-in-dropdown-list-in-html5/
+
+never[] javascript
+
+how to get the multiple selected options into an array in react -->https://www.techiedelight.com/get-selected-values-multi-select-dropdown-javascript/
+
+how to handle if the multiple checkboxes are there --> chatGPT
+
+----------------------------------------------------------------------
+
+function AllMachineList() {
+  const [machinesList, setMachinesList] = useState([]);
+  let temp = [];
+  let querySnapshot = [];
+  const getList = async () => {
+    querySnapshot = await getDocs(collection(db, "AllMachinesList"));
+    querySnapshot.forEach((doc) => {
+      temp.push(doc.data());
+    });
+  };
+  useEffect(() => {
+    getList();
+    setMachinesList(temp);
+  }, []);
+  useEffect(() => {
+    console.log(machinesList, "here");
+  }, [machinesList]);
+  return (
+    <div>
+      {machinesList.map((obj) => (
+        <div>{obj.MachineType}</div>
+      ))}
+    </div>
+  );
+}
+
+this is my function where the divs in return should be rendered as soon as page loads, but they are not , why
+
+answer by chatGPT 
+
+The reason why the divs are not rendered as soon as the page loads is that getList() function is asynchronous, and it takes some time to fetch the data from the database. In the meantime, the setMachinesList() function is called with the empty temp array, which is the initial value of machinesList. This is why the divs are not displayed when the page loads.
+
+To fix this issue, you can use the useState hook to initialize the machinesList state with an empty array, and then update it inside the getList() function after fetching the data from the database. This way, the machinesList state will be updated with the fetched data, and the divs will be rendered properly.
+
+Here's an updated version of the AllMachineList() function:
+function AllMachineList() {
+  const [machinesList, setMachinesList] = useState([]);
+
+  useEffect(() => {
+    const getList = async () => {
+      const querySnapshot = await getDocs(collection(db, "AllMachinesList"));
+      const temp = [];
+      querySnapshot.forEach((doc) => {
+        temp.push(doc.data());
+      });
+      setMachinesList(temp);
+    };
+
+    getList();
+  }, []);
+
+  useEffect(() => {
+    console.log(machinesList, "here");
+  }, [machinesList]);
+
+  return (
+    <div>
+      {machinesList.map((obj) => (
+        <div key={obj.id}>{obj.MachineType}</div>
+      ))}
+    </div>
+  );
+}
+
+In this updated version, we've moved the getList() function inside the useEffect() hook, and we're now setting the machinesList state inside the getList() function after fetching the data. We've also added a key prop to the divs in the map() function, which is required by React to help it identify the items in the list.
+
+-------------------------------------------------------------------------------
+https://firebase.google.com/docs/firestore/quickstart?authuser=0&hl=en
+
+https://firebase.google.com/docs/firestore/manage-data/delete-data
+
+https://firebase.google.com/docs/firestore/query-data/order-limit-data#web-version-9_2
+
+https://firebase.google.com/docs/firestore/data-model
+
+https://firebase.google.com/docs/firestore/query-data/get-data
+
+playlist for firestore web 9 version(compact in size only 15videos-->1hr content) -->  https://www.youtube.com/playlist?list=PL4cUxeGkcC9jERUGvbudErNCeSZHWUVlb , particularly refered this video in the above playlist while coding https://www.youtube.com/watch?v=s1frrNxq4js
+
+searced for of loop
+searced break
+
+iteration using map needs a key, refer this for details( not yet understood properly)--> https://dev.to/inverseswirl/4-easy-ways-to-loop-data-in-react-array-map-method-4f3l
+
+searced --> foreach iterates over object or array
+
+regarding date and time in JS(before using first check the typeof the variable as this is not c and cpp) --> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime
+
+searced ---> what getmonth will return in javascript
