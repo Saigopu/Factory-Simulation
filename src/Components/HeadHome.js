@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-// import { prevState } from "react";
+import { prevState } from "react";
 import { db } from "../Config/FirebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 import { NavLink } from "react-router-dom";
@@ -23,10 +23,12 @@ function HeadHome() {
   const [machineData, setMachineDate] = useState({
     MachineID: "",
     MachineType: "",
+    MTTF: "",
   });
   const [adjusterData, setadjusterDate] = useState({
     AdjusterID: "",
     AdjusterExpertise: [],
+    AdjusterName: "",
   });
 
   // const [checkboxdata, setCheckboxdata] = useState([]);
@@ -44,6 +46,12 @@ function HeadHome() {
       MachineType: event.target.value,
     }));
   }
+  function MTTFHandler(event) {
+    setMachineDate((prevState) => ({
+      ...prevState,
+      MTTF: event.target.value,
+    }));
+  }
   async function submitHandler(event) {
     event.preventDefault();
     console.log(
@@ -53,11 +61,16 @@ function HeadHome() {
     );
 
     try {
-      const docRef = await addDoc(collection(db, "AllMachinesList"), {
-        ...machineData,
-        MTTF: "5",
-      });
-      console.log("Document written with ID: ", docRef.id);
+      const docRef = await addDoc(
+        collection(db, "AllMachinesList"),
+        machineData
+      );
+      console.log(machineData);
+      const docRefr = await addDoc(
+        collection(db, "WorkingMachines"),
+        machineData
+      );
+      console.log("Document written with ID: ", docRef.id, docRefr.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -65,6 +78,7 @@ function HeadHome() {
     setMachineDate({
       MachineID: "",
       MachineType: "",
+      MTTF: "",
     });
   }
   //------------------------------------------------------------------------------
@@ -75,12 +89,15 @@ function HeadHome() {
       AdjusterID: event.target.value,
     }));
   }
-  // let value = [];
+  function adjusterNameHandler(event) {
+    setadjusterDate((prevState) => ({
+      ...prevState,
+      AdjusterName: event.target.value,
+    }));
+  }
   function adjusterExpertiseHandler(event) {
-    // console.log(key, typeof key, isChecked, checkboxdata[key]);
     const isChecked = event.target.checked;
     if (isChecked) {
-      // value = [...value, event.target.value];
       setadjusterDate((prevState) => ({
         ...prevState,
         AdjusterExpertise: [
@@ -89,8 +106,6 @@ function HeadHome() {
         ],
       }));
     } else {
-      // const index = value.indexOf(event.target.value);
-      // value.splice(index, 1);
       setadjusterDate((prevState) => ({
         ...prevState,
         AdjusterExpertise: adjusterData.AdjusterExpertise.filter(
@@ -102,19 +117,29 @@ function HeadHome() {
   async function adjusterSubmitHandler(event) {
     event.preventDefault();
 
-    // console.log(value);
-    // value = [];
-    console.log(
-      "before submitting",
-      adjusterData.AdjusterID,
-      adjusterData.AdjusterExpertise
-    );
-
+    console.log("before submitting", adjusterData);
+    const nowTime = new Date();
+    const year = `${nowTime.getFullYear()}`;
+    let month = `${nowTime.getMonth()}`;
+    month = month.length === 1 ? "0" + month : month;
+    let date = `${nowTime.getDate()}`;
+    date = date.length === 1 ? "0" + date : date;
+    let hour = `${nowTime.getHours()}`;
+    hour = hour.length === 1 ? "0" + hour : hour;
+    let minutes = `${nowTime.getMinutes()}`;
+    minutes = minutes.length === 1 ? "0" + minutes : minutes;
+    let seconds = `${nowTime.getSeconds()}`;
+    seconds = seconds.length === 1 ? "0" + seconds : seconds;
     try {
-      const docRef = await addDoc(collection(db, "AllAdjustersList"), {
+      const docRef = await addDoc(
+        collection(db, "AllAdjustersList"),
+        adjusterData
+      );
+      const docRefr = await addDoc(collection(db, "IdleAdjusters"), {
         ...adjusterData,
-        AdjusterName: "sai",
+        Stamp: year + month + date + hour + minutes + seconds,
       });
+
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -123,6 +148,7 @@ function HeadHome() {
     setadjusterDate({
       AdjusterID: "",
       AdjusterExpertise: [],
+      AdjsuterName: "",
     });
   }
   // ---------------------------------------------------------------------------------------------
@@ -137,16 +163,24 @@ function HeadHome() {
       <nav className="border-2 border-black p-4 bg-pink-300">
         <ul className="flex justify-around ">
           <li>
-            <NavLink to="/headhome" className="underline">Add Adjusters/Machines</NavLink>
+            <NavLink to="/headhome" className="underline">
+              Add Adjusters/Machines
+            </NavLink>
           </li>
           <li>
-            <NavLink to="/allmachines" className="underline">All Machines</NavLink>
+            <NavLink to="/allmachines" className="underline">
+              All Machines
+            </NavLink>
           </li>
           <li>
-            <NavLink to="/alladjusters" className="underline">All Adjusters</NavLink>
+            <NavLink to="/alladjusters" className="underline">
+              All Adjusters
+            </NavLink>
           </li>
           <li>
-            <NavLink to="/statistics" className="underline">Statistics</NavLink>
+            <NavLink to="/statistics" className="underline">
+              Statistics
+            </NavLink>
           </li>
         </ul>
       </nav>
@@ -181,7 +215,18 @@ function HeadHome() {
             <option value="Type C">Type C</option>
           </select>
         </div>
-        <button className="border-2 border-black rounded">Submit</button>
+        <div>
+          <label htmlFor="MTTF">MTTF</label>
+          <input
+            type="text"
+            id="MTTF"
+            placeholder="  in days"
+            onChange={MTTFHandler}
+            className="border-2 border-black rounded"
+            value={machineData.MTTF}
+          />
+        </div>
+        <button className="border-2 border-black rounded w-14">Add</button>
       </form>
 
       {/* ------------------------------------------------------------------------------- */}
@@ -203,6 +248,17 @@ function HeadHome() {
           />
         </div>
         <div>
+          <label htmlFor="adjusterName">Adjuster Name</label>
+          {/* adjuster id should be unique for every machine */}
+          <input
+            type="text"
+            id="adjusterName"
+            className="border-2 border-black rounded"
+            onChange={adjusterNameHandler}
+            value={adjusterData.AdjusterName}
+          />
+        </div>
+        <div>
           {/* <label htmlFor="adjusterExpertiseSelect">Choose the expertise:</label>
           <select
             name="machineTypes"
@@ -217,7 +273,7 @@ function HeadHome() {
             <option value="Type B">Type B</option>
             <option value="Type C">Type C</option>
           </select> */}
-          <div className="border-2 border-black">
+          <div className="">
             <p>Select Expertise :</p>
             <div className="flex gap-3">
               <input
@@ -250,7 +306,7 @@ function HeadHome() {
             </div>
           </div>
         </div>
-        <button className="border-2 border-black rounded">Submit</button>
+        <button className="border-2 border-black rounded w-14">Add</button>
       </form>
     </div>
   );
