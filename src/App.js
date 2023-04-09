@@ -9,6 +9,7 @@ import Statistics from "./Components/Statistics";
 import IdleAdjusters from "./Components/IdleAdjusters";
 import InoperativeMachines from "./Components/InoperativeMachines";
 import { Route, Routes } from "react-router-dom";
+import NotFoundPage from "./Components/NotFoundPage";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/allmachines" element={<AllMachineList />} />
         <Route path="/alladjusters" element={<AllAdjustersList />} />
         <Route path="/statistics" element={<Statistics />} />
+        <Route path="*" element={<NotFoundPage/>} />
       </Routes>
     </div>
   );
