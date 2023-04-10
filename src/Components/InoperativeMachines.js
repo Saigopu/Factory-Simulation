@@ -14,13 +14,6 @@ import { NavLink } from "react-router-dom";
 
 function InoperativeMachines() {
   const [inoperativeMachines, setInoperativeMachines] = useState([]);
-  const [adjuster, setAdjuster] = useState({
-    AdjusterName: "",
-    AdjusterExpertise: [],
-    AdjusterID: "",
-    MRefID: "",
-    Stamp: "",
-  });
 
   async function getList() {
     let filtered = [];
@@ -62,7 +55,7 @@ function InoperativeMachines() {
       if (adj === "no") {
         alert("adjuster not available");
       } else {
-        setAdjuster(adj);
+        editCollections(adj);
       }
     });
   }
@@ -87,10 +80,6 @@ function InoperativeMachines() {
     await deleteDoc(doc(db, "IdleAdjusters", adjuster.RefID));
     getList();
   }
-
-  useEffect(() => {
-    editCollections(adjuster);
-  }, [adjuster]);
 
   const displayList = inoperativeMachines.map((obj) => (
     <div
