@@ -1,6 +1,6 @@
 import React from "react";
 import { db } from "../Config/FirebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDoc, getDocs,query,where } from "firebase/firestore";
 import { doc, deleteDoc } from "firebase/firestore";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -21,14 +21,29 @@ function AllAdjustersList() {
   };
   useEffect(() => {
     getList();
-    //the above fuction is asynchronous
+    //the above function is asynchronous
   }, []);
   useEffect(() => {
     console.log(adjustersList, "here");
   }, [adjustersList]);
 
   async function deleteHandler(RefID) {
+    const docsnap = await getDoc(doc(db, "AllAdjustersList", RefID));
+    // await deleteDoc(doc(db, "AllAdjustersList", RefID));
+    const q = query(
+      collection(db, "IdleAdjusters"),
+      where("AdjusterID", "==", docsnap.data().AdjusterID)
+    );
+    console.log(q, "printing q");
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.docs.length == 0) {
+      alert("the adjuster is repairing");
+      getList();
+      return;
+    }
+    await deleteDoc(doc(db, "IdleAdjusters", querySnapshot.docs[0].id));
     await deleteDoc(doc(db, "AllAdjustersList", RefID));
+
     getList();
   }
 
@@ -60,20 +75,30 @@ function AllAdjustersList() {
       <nav className="border-2 border-black p-4 bg-pink-300">
         <ul className="flex justify-around ">
           <li>
-            <NavLink to="/headhome" className="underline">Add Adjusters/Machines</NavLink>
+            <NavLink to="/headhome" className="underline">
+              Add Adjusters/Machines
+            </NavLink>
           </li>
           <li>
-            <NavLink to="/allmachines" className="underline">All Machines</NavLink>
+            <NavLink to="/allmachines" className="underline">
+              All Machines
+            </NavLink>
           </li>
           <li>
-            <NavLink to="/alladjusters" className="underline">All Adjusters</NavLink>
+            <NavLink to="/alladjusters" className="underline">
+              All Adjusters
+            </NavLink>
           </li>
           <li>
-            <NavLink to="/statistics" className="underline">Statistics</NavLink>
+            <NavLink to="/statistics" className="underline">
+              Statistics
+            </NavLink>
           </li>
         </ul>
       </nav>
-      <h1 className="font-bold text-center text-4xl mt-2">All Adjusters List</h1>
+      <h1 className="font-bold text-center text-4xl mt-2">
+        All Adjusters List
+      </h1>
       <div className="border-2 border-black m-6 rounded flex justify-around p-3">
         <p>AdjusterID</p>
         <p>AdjusterName</p>

@@ -148,7 +148,7 @@ function HeadHome() {
     setadjusterDate({
       AdjusterID: "",
       AdjusterExpertise: [],
-      AdjsuterName: "",
+      AdjusterName: "",
     });
   }
   // ---------------------------------------------------------------------------------------------
