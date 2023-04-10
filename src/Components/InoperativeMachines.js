@@ -12,7 +12,6 @@ import { db } from "../Config/FirebaseConfig";
 import { query, orderBy, onSnapshot } from "firebase/firestore";
 import { NavLink } from "react-router-dom";
 
-
 function InoperativeMachines() {
   const [inoperativeMachines, setInoperativeMachines] = useState([]);
   const [adjuster, setAdjuster] = useState({
@@ -24,12 +23,16 @@ function InoperativeMachines() {
   });
 
   async function getList() {
-    const querySnapshot = await getDocs(collection(db, "InoperativeMachines"));
-    let temp = [];
-    querySnapshot.forEach((doc) => {
-      temp.push({ ...doc.data(), RefID: doc.id });
+    let filtered = [];
+    const ref = collection(db, "InoperativeMachines");
+    const q = query(ref, orderBy("Stamp"));
+    onSnapshot(q, (snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        filtered.push({ ...doc.data(), RefID: doc.id });
+      });
+      console.log(filtered[0], filtered[1], "check"); //this line and below line must be put here because of the asyncronous nature of the getList function, if these lines are kept outside of the function(onSnapshot) then they execute before this function executes, so gives wrong results
+      setInoperativeMachines(filtered);
     });
-    setInoperativeMachines(temp);
   }
 
   useEffect(() => {
@@ -108,7 +111,7 @@ function InoperativeMachines() {
 
   return (
     <div>
-    <nav className="border-2 border-black p-4 bg-purple-400">
+      <nav className="border-2 border-black p-4 bg-purple-400">
         <ul className="flex justify-around ">
           <li>
             <NavLink to="/managerhome" className="underline">
@@ -142,7 +145,3 @@ function InoperativeMachines() {
 }
 
 export default InoperativeMachines;
-
-
-
-
